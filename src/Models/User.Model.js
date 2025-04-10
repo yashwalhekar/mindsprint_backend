@@ -103,13 +103,23 @@ exports.getAllAdminUsers = async () => {
 };
 
 // ✅ Update user status
-exports.updateStatus = async (id, status) => {
+exports.updateStatus = async (user_id, status) => {
   try {
-    const sql = `UPDATE users SET status = @status WHERE id = @id`;
-    const request = getDBConnection();
-    request.input("id", sql.Int, id);
-    request.input("status", sql.NVarChar, status);
-    const result = await request.query(sql);
+    const request = await getDBConnection();  // ✅ Await the connection
+
+    // ✅ Use correct SQL parameter types
+    request.input("user_id", sql.Int, user_id);  
+    request.input("status", sql.NVarChar, status);  
+
+    const query = `UPDATE users SET status = @status WHERE user_id = @user_id`;
+
+    const result = await request.query(query);
+
+    if (result.rowsAffected[0] === 0) {
+      throw new Error("User not found or status unchanged.");
+    }
+
+    console.log("✅ User status updated:", result);
     return result;
   } catch (error) {
     console.error("❌ Error updating user status:", error.message);

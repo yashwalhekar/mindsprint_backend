@@ -4,4 +4,8 @@ const enrollUserService = async (user_id, course_id) => {
   return await Enrollment.enrollUser(user_id, course_id);
 };
 
-module.exports = { enrollUserService };
+const getALLEnrollements= async()=>{
+  return await Enrollment.getAllEnrollees()
+}
+
+module.exports = { enrollUserService ,getALLEnrollements};

@@ -1,13 +1,14 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const authRoutes = require("./src/Routes/authRoute");
+const authRoutes = require("../mindmed-backend/src/Routes/authRoute");
 const cors = require("cors");
 
-const adminRoutes = require("./src/Routes/adminRoutes");
-const courseRoutes = require("./src/Routes/courseRoute");
+const adminRoutes = require("../mindmed-backend/src/Routes/adminRoutes");
+const courseRoutes = require("../mindmed-backend/src/Routes/courseRoute");
 const { getDBConnection, connectToDB } = require("./src/config/db");
-const moduleRoute = require("./src/Routes/module.Route")
+const moduleRoute = require("../mindmed-backend/src/Routes/module.Route")
 const enrollmentRoutes = require("./src/Routes/enrollment.Route");
+const notesRoutes = require("./src/Routes/notes.Route")
 const app = express();
 
 app.use(cors());
@@ -22,7 +23,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/",courseRoutes);
 app.use("/api/",moduleRoute);
-// app.use("/api", enrollmentRoutes);
+app.use("/api", enrollmentRoutes);
+app.use("/api",notesRoutes)
 
 
 

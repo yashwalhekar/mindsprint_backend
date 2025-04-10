@@ -1,5 +1,5 @@
 const express = require("express");
-const { getAllUsers, updateUserRole, deleteUser, getAllAdmins, addNewUser, addNewCourse, getCourses, updateUserStatus, removeCourse, getCourseByid, addnewModules, deleteModule, addLessons, deleteLessons, getAllModules, getAllLessons, updateCourseStatus } = require("../Controllers/adminController");
+const { getAllUsers, updateUserRole, deleteUser, getAllAdmins, addNewUser, addNewCourse, getCourses, updateUserStatus, removeCourse, getCourseByid, addnewModules, deleteModule, addLessons, deleteLessons, getAllModules, getAllLessons, updateCourseStatus, addNotes, getAllNotesAdmin } = require("../Controllers/adminController");
 const authMiddleware = require("../Middleware/authMiddleware");
 const adminMiddleware = require("../Middleware/adminMiddleware");
 
@@ -25,6 +25,10 @@ router.delete("/course/:course_id/module/:module_id", authMiddleware, adminMiddl
 router.get("/course/:course_id/module/:module_id/lecture",authMiddleware,adminMiddleware,getAllLessons);
 router.post("/course/:course_id/module/:module_id/lecture",authMiddleware,adminMiddleware,addLessons);
 router.delete("/course/:course_id/module/:module_id/lecture/:lesson_id",authMiddleware,adminMiddleware,deleteLessons);
+
+
+router.post("/course/:course_id/module/:module_id/lecture/:lesson_id/notes", authMiddleware, adminMiddleware, addNotes);
+router.get("/course/:course_id/module/:module_id/lecture/:lesson_id/view_notes", authMiddleware,getAllNotesAdmin)
 
 
 

@@ -1,4 +1,4 @@
-const { enrollUserService } = require("../Services/enrollment.Service");
+const { enrollUserService, getALLEnrollements } = require("../Services/enrollment.Service");
 
 const enrollUser = async (req, res) => {
   try {
@@ -16,4 +16,15 @@ const enrollUser = async (req, res) => {
   }
 };
 
-module.exports = { enrollUser };
+const getAllEnrollesInfo = async(req,res)=>{
+  try {
+    const response = await getALLEnrollements()
+
+    return res.status(response.success?200:400).json(response)
+  } catch (error) {
+    console.log("error in controller",error.message)
+    return res.status(500).json({success:false,message:error.message})
+  }
+}
+
+module.exports = { enrollUser,getAllEnrollesInfo };

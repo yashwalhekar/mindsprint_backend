@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 const courseModel = require("../Models/Course.Model");
 const moduleModel = require("../Models/modules.model");
 const lectureModel = require("../Models/lectures.Model");
+const notesModel = require("../Models/notes.Model");
 const addUser = async (userData) => {
   const {
     first_name,
@@ -104,14 +105,13 @@ const deleteUser = async (id) => {
   return { message: "User deleted successfully" };
 };
 
-const usersStatusUpdate = async (id, status) => {
-  if (!id) {
+const usersStatusUpdate = async (user_id, status) => {
+  if (!user_id) {
     throw new Error("User id is required!!");
   }
-  await userModel.updateStatus(id, status);
+  await userModel.updateStatus(user_id, status);
   return { message: "User status updated successfully" };
 };
-
 
 //____________________________Courses_____________________________________________
 
@@ -133,7 +133,7 @@ const addCourse = async (courseData) => {
     instructor_id,
     status,
     prerequisites,
-    creator
+    creator,
   } = courseData;
 
   // Validate required fields
@@ -183,15 +183,13 @@ const getAllCourse = async () => {
   return await courseModel.getAllCourses();
 };
 
-
-
-const courseStatusUpdate= async (id,status)=>{
-  if(!id){
-    throw new Error("Course id not found!!")
+const courseStatusUpdate = async (id, status) => {
+  if (!id) {
+    throw new Error("Course id not found!!");
   }
-  await courseModel.updateStatus(id,status)
+  await courseModel.updateStatus(id, status);
   return { message: "Course status updated successfully" };
-}
+};
 
 const deleteCourse = async (id) => {
   if (!id) {
@@ -209,8 +207,6 @@ const getCourseById = async (id) => {
   return { mesaage: "Course found successfully" };
 };
 
-
-
 //_____________________________________MODULES_______________________________________________
 
 const getAllModules = async (course_id) => {
@@ -220,7 +216,7 @@ const getAllModules = async (course_id) => {
     }
 
     console.log(`Fetching modules for course_id: ${course_id}`);
-    return await moduleModel.getAllModules(parseInt(course_id));  // Ensure it is an integer
+    return await moduleModel.getAllModules(parseInt(course_id)); // Ensure it is an integer
   } catch (error) {
     console.error("❌ Error fetching modules:", error);
     throw error;
@@ -230,21 +226,27 @@ const getAllModules = async (course_id) => {
 const addModules = async (title, course_id, position) => {
   try {
     // Check only within the same course
-    const existingModule = await moduleModel.getModulesByTitle(title, course_id);
-    
+    const existingModule = await moduleModel.getModulesByTitle(
+      title,
+      course_id
+    );
+
     if (existingModule) {
       throw new Error("Module with this title already exists in this course");
     }
 
     // Create a new module
-    const newModule = await moduleModel.createModule(title, course_id, position);
+    const newModule = await moduleModel.createModule(
+      title,
+      course_id,
+      position
+    );
 
     return newModule;
   } catch (error) {
     throw new Error(`Error creating module: ${error.message}`);
   }
 };
-
 
 const getModuleByCourseId = async (course_id) => {
   try {
@@ -275,8 +277,8 @@ const deleteModule = async (course_id, module_id) => {
 
 //____________________Lectures___________________________________________________
 
-const getAllLectures = async (course_id,module_id) => {
-  return await lectureModel.getAllLectures(course_id,module_id);
+const getAllLectures = async (course_id, module_id) => {
+  return await lectureModel.getAllLectures(course_id, module_id);
 };
 
 const addLessons = async (lectures) => {
@@ -326,6 +328,41 @@ const deleteLesson = async (lesson_id) => {
   }
 };
 
+//____________________________________NOtes_______________________________
+
+const createAdminNotes = async(notes)=>{
+try {
+  const{ course_id, module_id, lesson_id, title, content, fileUrl, noteType} =notes
+  console.log("parameters recieved in admin service",{ course_id, module_id, lesson_id, title, content, fileUrl, noteType})
+
+  const newNotes = await notesModel.addAdminNote(
+    course_id,
+    module_id,
+    lesson_id,
+    title,
+    content,
+    fileUrl,
+    noteType
+  )
+  console.log("newnotes",newNotes);
+  
+
+  return newNotes;
+
+} catch (error) {
+  console.log("error in service file",error.mesaage);
+
+}
+}
+
+
+const getNotesAdmin = async(course_id,module_id,lesson_id)=>{
+   return await notesModel.getAllNotesAdmin(course_id,module_id,lesson_id)
+}
+
+
+
+
 module.exports = {
   getAllUsers,
   updateUserRole,
@@ -345,5 +382,7 @@ module.exports = {
   getAllLectures,
   getAllLectures,
   addLessons,
-  deleteLesson
+  deleteLesson,
+  createAdminNotes,
+  getNotesAdmin
 };

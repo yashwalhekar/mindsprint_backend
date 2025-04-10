@@ -1,5 +1,5 @@
 const db = require("../config/db");
-
+const sql = require("mssql"); // Ensure mssql is imported properly
 // ✅ Create Table in MSSQL
 const createTable = async () => {
   try {
@@ -36,15 +36,21 @@ createTable().catch((err) => console.error("Error creating table:", err));
 // ✅ Get All Lectures by course_id and module_id
 exports.getAllLectures = async (course_id, module_id) => {
   try {
+    console.log("module_id in lecture model:", module_id);
+
+    if (!module_id || isNaN(module_id)) {
+      throw new Error("Invalid module_id: " + module_id);
+    }
+
     const pool = await db.connectToDB();
     const sqlQuery = `
       SELECT * 
       FROM lectures 
       WHERE module_id = @module_id 
     `;
-    
+
     const result = await pool.request()
-      .input("module_id", db.sql.Int, module_id)
+      .input("module_id", sql.Int, parseInt(module_id, 10)) // Ensure it's an integer
       .query(sqlQuery);
 
     return result.recordset;

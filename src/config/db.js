@@ -26,7 +26,7 @@ const connectToDB = async () => {
       pool = await sql.connect(config);
       
       console.log("✅ SQL Server connected successfully!");
-      return pool;   //here i return the pool it allows you to call pool.request
+      return pool;//here i return the pool it allows you to call pool.request
     }
     return pool;
   } catch (error) {

@@ -17,6 +17,8 @@ const {
   deleteLesson,
   getAllModules,
   courseStatusUpdate,
+  createAdminNotes,
+  getNotesAdmin,
 } = require("../Services/adminService");
 
 //___________________USER__________________________________________________________
@@ -113,10 +115,13 @@ exports.updateCourseStatus = async (req, res) => {
 
 exports.updateUserStatus = async (req, res) => {
   try {
-    const { id, is_active } = req.body;
-    const response = await usersStatusUpdate(id, is_active);
+    const { user_id, is_active } = req.body;
+   
+    const response = await usersStatusUpdate(user_id, is_active);
     res.status(200).json(response);
   } catch (error) {
+    console.log("error");
+    
     res.status(400).json({ error: error.message });
   }
 };
@@ -145,16 +150,10 @@ exports.getCourseByid = async (req, res) => {
 
 exports.getAllModules = async (req, res) => {
   try {
-    console.log("Received course_id:", req.params);  // Debug to confirm the parameter
-
     let { course_id } = req.params;
-
-    // Validate and convert course_id to a number
     if (!course_id || isNaN(course_id)) {
       return res.status(400).json({ error: `Invalid course_id: ${course_id}` });
     }
-
-    // Ensure course_id is a number before passing to the service
     course_id = parseInt(course_id, 10); 
 
     const response = await getAllModules(course_id); 
@@ -270,3 +269,69 @@ exports.deleteLessons = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+
+
+//---------------------------Notes-------------------------------------------------------
+
+exports.addNotes = async(req,res)=>{
+  try {
+    const {course_id,module_id,lesson_id} = req.params
+
+    // console.log("recieved by params","course_id:",course_id,"mocule_id:",module_id,"lesson_id:",lesson_id)
+
+    const {title,content,fileUrl,noteType} = req.body
+
+    console.log("recieved by body",req.body)
+
+    const response = await createAdminNotes({
+      course_id: parseInt(course_id),
+      module_id: parseInt(module_id),
+      lesson_id: parseInt(lesson_id),
+      title,
+      content,
+      fileUrl,
+      noteType,  
+    });
+    console.log("notes added:", response);
+    res.status(200).json(response);
+  } catch (error) {
+    console.error("Error in controller:", error.message);
+    res.status(400).json({ error: error.message });
+  }
+}
+
+
+exports.getAllNotesAdmin = async (req, res) => {
+  try {
+    const { course_id, module_id, lesson_id } = req.params;
+ 
+
+    console.log("Received from request:", { course_id, module_id, lesson_id });
+
+    const parsedCourseId = parseInt(course_id);
+    const parsedModuleId = parseInt(module_id);
+    const parsedLessonId = parseInt(lesson_id);
+
+    if (
+
+      isNaN(parsedCourseId) || 
+      isNaN(parsedModuleId) || 
+      isNaN(parsedLessonId)
+    ) {
+      throw new Error("Invalid input: All IDs must be numbers.");
+    }
+
+    // Call the function with correctly formatted parameters
+    const response = await getNotesAdmin(parsedCourseId, parsedModuleId, parsedLessonId);
+
+    console.log("Controller Response:", response);
+
+    res.status(200).json(response);
+  } catch (error) {
+    console.error("Error in controller:", error.message);
+    res.status(400).json({ error: error.message });
+  }
+};
+
+
